@@ -180,5 +180,5 @@ class HiveDataStore {
 }
 
 final dataStoreProvider = Provider<HiveDataStore>((ref) {
-  throw UnimplementedError();
+  throw UnimplementedError(); // override in main.dart ProviderScope
 });

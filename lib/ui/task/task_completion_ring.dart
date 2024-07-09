@@ -17,7 +17,8 @@ class TaskCompletionRing extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 1.0,
       child: CustomPaint(
-        painter: RingPainter(progress, Colors.black, Colors.white),
+        painter:
+            RingPainter(progress, Colors.black.withOpacity(0.6), Colors.white),
       ),
     );
   }

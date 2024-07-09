@@ -10,9 +10,13 @@ class TaskAnimated extends StatefulWidget {
   const TaskAnimated({
     super.key,
     required this.iconName,
+    required this.completed,
+    this.onCompleted,
   });
 
   final String iconName;
+  final bool completed;
+  final ValueChanged<bool>? onCompleted;
   @override
   State<TaskAnimated> createState() => _TaskAnimatedState();
 }
@@ -44,6 +48,7 @@ class _TaskAnimatedState extends State<TaskAnimated>
     if (status == AnimationStatus.completed) {
       setState(() {
         _showCheckIcon = true;
+        widget.onCompleted?.call(true);
       });
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
@@ -54,10 +59,14 @@ class _TaskAnimatedState extends State<TaskAnimated>
   }
 
   void _handleTapDown(TapDownDetails tapDetails) {
-    if (_animationController.status != AnimationStatus.completed) {
+    if (!widget.completed &&
+        _animationController.status != AnimationStatus.completed) {
       _animationController.forward();
-    } else {
+      widget.onCompleted?.call(false);
+    } else if (!_showCheckIcon) {
       _animationController.value = 0.0;
+
+      widget.onCompleted?.call(false);
     }
   }
 
@@ -78,14 +87,15 @@ class _TaskAnimatedState extends State<TaskAnimated>
       child: AnimatedBuilder(
         animation: _curvedAnimation,
         builder: (BuildContext context, Widget? child) {
-          final hasCompleted = _curvedAnimation.value == 1.0;
+          final progress = widget.completed ? 1.0 : _curvedAnimation.value;
+          final hasCompleted = progress == 1.0;
           return Stack(children: [
-            TaskCompletionRing(progress: _curvedAnimation.value),
+            TaskCompletionRing(progress: progress),
             Positioned.fill(
                 child: CenterSvgIcon(
                     iconName:
                         _showCheckIcon ? AppAssets.check : widget.iconName,
-                    color: hasCompleted ? Colors.black : Colors.white))
+                    color: hasCompleted ? Colors.purple : Colors.white))
           ]);
         },
       ),

@@ -1,15 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
-import 'package:habbit_tracker/models/task_preset.dart';
 import 'package:habbit_tracker/ui/task/animated_task.dart';
 
+import '../../models/task.dart';
+
+//Non Reactive
 class TaskWithName extends StatelessWidget {
   const TaskWithName({
     super.key,
     required this.task,
+    this.completed = false,
+    this.onCompleted,
   });
-  final TaskPreset task;
+  final Task task;
+  final bool completed;
+  final ValueChanged<bool>? onCompleted;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,11 @@ class TaskWithName extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: TaskAnimated(iconName: task.iconName),
+          child: TaskAnimated(
+            iconName: task.iconName,
+            completed: completed,
+            onCompleted: onCompleted,
+          ),
         ),
         const SizedBox(
           height: 20,

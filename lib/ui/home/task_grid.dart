@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:habbit_tracker/ui/task/task_with_name.dart';
-
-import '../../models/task_preset.dart';
+import '../../models/task.dart';
+import '../task/task_with_name_loader.dart';
 
 class TaskGrid extends StatelessWidget {
   const TaskGrid({
@@ -10,7 +9,7 @@ class TaskGrid extends StatelessWidget {
     required this.tasks,
   });
 
-  final List<TaskPreset> tasks;
+  final List<Task> tasks;
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
@@ -22,7 +21,7 @@ class TaskGrid extends StatelessWidget {
           crossAxisSpacing: 20,
           childAspectRatio: 0.8),
       itemBuilder: (context, index) {
-        return TaskWithName(
+        return TaskWithNameLoader(
           task: tasks[index],
         );
       },
