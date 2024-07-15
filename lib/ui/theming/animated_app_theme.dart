@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habbit_tracker/ui/theming/app_theme.dart';
+import 'package:habit_tracker/ui/theming/app_theme.dart';
 
 class AppThemeDataTween extends Tween<AppThemeData> {
   AppThemeDataTween({super.begin, super.end});

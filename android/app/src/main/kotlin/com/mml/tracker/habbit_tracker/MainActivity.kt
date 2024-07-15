@@ -1,4 +1,4 @@
-package com.mml.tracker.habbit_tracker
+package com.mml.tracker.habit_tracker
 
 import io.flutter.embedding.android.FlutterActivity
 

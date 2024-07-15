@@ -1,4 +1,4 @@
-# habbit_tracker
+# habit_tracker
 
 This application can track your daily activity. If you want to change your habbit, it might help.
 

@@ -1,5 +1,5 @@
-name: habbit_tracker
-description: "This application can track your daily activity. If you want to change your habbit, it might help."
+name: habit_tracker
+description: "This application can track your daily activity. If you want to change your habit, it might help."
   
   
 publish_to: 'none'   
@@ -21,9 +21,9 @@ dependencies:
   hive: 2.2.3
   hive_flutter: 1.1.0
   modal_bottom_sheet: 3.0.0
-  page_flip_builder: 0.1.4
   uuid: 4.4.0
   flutter_native_splash: ^2.4.1
+  google_mobile_ads: ^5.1.0
   
 
 dev_dependencies:

@@ -24,12 +24,7 @@ class AppThemeManager extends StateNotifier<AppThemeSettings> {
   }
 }
 
-final frontThemeManagerProvider =
-    StateNotifierProvider<AppThemeManager, AppThemeSettings>((ref) {
-  throw UnimplementedError();
-});
-
-final backThemeManagerProvider =
+final appThemeManagerProvider =
     StateNotifierProvider<AppThemeManager, AppThemeSettings>((ref) {
   throw UnimplementedError();
 });

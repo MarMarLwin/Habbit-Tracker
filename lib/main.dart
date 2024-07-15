@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:habbit_tracker/ui/home/home_page.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:habit_tracker/ui/home/home_page.dart';
 
 import 'constants/app_assets.dart';
 import 'models/front_or_back_side.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   await AppAssets.preloadSVGs();
   final dataStore = HiveDataStore();
   await dataStore.init();
+  MobileAds.instance.initialize();
 
   //create demo tasks
   dataStore.createDemoTasks(frontTasks: [
@@ -28,20 +30,13 @@ Future<void> main() async {
     Task.create(name: 'Read for 10 Minutes', iconName: AppAssets.book),
   ], backTasks: []);
 
-  final frontThemeSettings =
-      await dataStore.appThemeSettings(side: FrontOrBackSide.front);
-  final backThemeSettings =
-      await dataStore.appThemeSettings(side: FrontOrBackSide.back);
+  final appThemeSettings = await dataStore.appThemeSettings();
+
   runApp(ProviderScope(overrides: [
     dataStoreProvider.overrideWithValue(dataStore),
-    frontThemeManagerProvider.overrideWith((ref) => AppThemeManager(
-          themeSettings: frontThemeSettings,
+    appThemeManagerProvider.overrideWith((ref) => AppThemeManager(
+          themeSettings: appThemeSettings,
           side: FrontOrBackSide.front,
-          dataStore: dataStore,
-        )),
-    backThemeManagerProvider.overrideWith((ref) => AppThemeManager(
-          themeSettings: backThemeSettings,
-          side: FrontOrBackSide.back,
           dataStore: dataStore,
         )),
   ], child: const MyApp()));

@@ -1,4 +1,3 @@
-import 'package:habbit_tracker/models/front_or_back_side.dart';
 import 'package:hive/hive.dart';
 
 import '../constants/app_colors.dart';
@@ -9,10 +8,10 @@ part 'app_theme_settings.g.dart';
 @HiveType(typeId: 2)
 class AppThemeSettings {
   AppThemeSettings({required this.colorIndex, required this.variantIndex});
-  factory AppThemeSettings.defaults(FrontOrBackSide side) {
+  factory AppThemeSettings.defaults() {
     return AppThemeSettings(
       colorIndex: 0,
-      variantIndex: side == FrontOrBackSide.front ? 0 : 2,
+      variantIndex: 0,
     );
   }
   // Index used to reference one of the colors in AppColors

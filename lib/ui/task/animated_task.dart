@@ -1,10 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
-import 'package:habbit_tracker/ui/common_widgets/center_svg_icon.dart';
-import 'package:habbit_tracker/ui/task/task_completion_ring.dart';
+import 'package:habit_tracker/ui/common_widgets/center_svg_icon.dart';
+import 'package:habit_tracker/ui/task/task_completion_ring.dart';
 
 import '../../constants/app_assets.dart';
+import '../theming/app_theme.dart';
 
 class TaskAnimated extends StatefulWidget {
   const TaskAnimated({
@@ -95,7 +96,9 @@ class _TaskAnimatedState extends State<TaskAnimated>
                 child: CenterSvgIcon(
                     iconName:
                         _showCheckIcon ? AppAssets.check : widget.iconName,
-                    color: hasCompleted ? Colors.purple : Colors.white))
+                    color: hasCompleted
+                        ? AppTheme.of(context).primary
+                        : Colors.white))
           ]);
         },
       ),

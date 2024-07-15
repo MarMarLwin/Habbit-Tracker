@@ -14,8 +14,7 @@ class HiveDataStore {
   static const tasksStateBoxName = 'tasksState';
   static const flagsBoxName = 'flags';
   static String taskStateKey(String key) => 'tasksState/$key';
-  static const frontAppThemeBoxName = 'frontAppTheme';
-  static const backAppThemeBoxName = 'backAppTheme';
+  static const appThemeBoxName = 'aAppTheme';
 
   static const alwaysShowAddTaskKey = 'alwaysShowAddTask';
   static const didAddFirstTaskKey = 'didAddFirstTask';
@@ -33,8 +32,8 @@ class HiveDataStore {
     // task states
     await Hive.openBox<TaskState>(tasksStateBoxName);
     // theming
-    await Hive.openBox<AppThemeSettings>(frontAppThemeBoxName);
-    await Hive.openBox<AppThemeSettings>(backAppThemeBoxName);
+
+    await Hive.openBox<AppThemeSettings>(appThemeBoxName);
     // flags
     await Hive.openBox<bool>(flagsBoxName);
   }
@@ -94,21 +93,16 @@ class HiveDataStore {
   Future<void> setAppThemeSettings(
       {required AppThemeSettings settings,
       required FrontOrBackSide side}) async {
-    final themeKey = side == FrontOrBackSide.front
-        ? frontAppThemeBoxName
-        : backAppThemeBoxName;
+    const themeKey = appThemeBoxName;
     final box = Hive.box<AppThemeSettings>(themeKey);
     await box.put(themeKey, settings);
   }
 
-  Future<AppThemeSettings> appThemeSettings(
-      {required FrontOrBackSide side}) async {
-    final themeKey = side == FrontOrBackSide.front
-        ? frontAppThemeBoxName
-        : backAppThemeBoxName;
+  Future<AppThemeSettings> appThemeSettings() async {
+    const themeKey = appThemeBoxName;
     final box = Hive.box<AppThemeSettings>(themeKey);
     final settings = box.get(themeKey);
-    return settings ?? AppThemeSettings.defaults(side);
+    return settings ?? AppThemeSettings.defaults();
   }
 
   // Save and delete tasks
