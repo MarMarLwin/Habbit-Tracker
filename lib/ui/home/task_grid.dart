@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/models/app_theme_settings.dart';
+import 'package:habit_tracker/ui/animations/custom_fade_transition.dart';
 import 'package:habit_tracker/ui/animations/staggered_scale_transition.dart';
 import 'package:habit_tracker/ui/common_widgets/edit_task_button.dart';
 import 'package:habit_tracker/ui/theming/animated_app_theme.dart';
@@ -68,8 +69,11 @@ class TaskGridState extends State<TaskGrid>
             editTaskBuilder: (context) => StaggeredScaleTransition(
                 animation: _animationController,
                 index: index,
-                child: EditTaskButton(
-                  onPressed: widget.onEditTask,
+                child: CustomFadeTransition(
+                  animation: _animationController,
+                  child: EditTaskButton(
+                    onPressed: widget.onEditTask,
+                  ),
                 )),
           );
         },

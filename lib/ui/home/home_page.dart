@@ -20,10 +20,25 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage>
+    with SingleTickerProviderStateMixin {
   final leftAnimatorKey = GlobalKey<SlidingPanelAnimatorState>();
   final rightAnimatorKey = GlobalKey<SlidingPanelAnimatorState>();
   final gridAnimatorKey = GlobalKey<TaskGridState>();
+  late final AnimationController animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
 
   void _enterEditMode() {
     leftAnimatorKey.currentState?.slideIn();
@@ -129,14 +144,18 @@ class _HomePageState extends ConsumerState<HomePage> {
             floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.miniEndFloat,
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {},
-              child: InkWell(
-                  onTap: () {},
-                  child: CenterSvgIcon(
-                    iconName: AppAssets.plus,
-                    color: AppTheme.of(context).primary,
-                  )),
+            floatingActionButton: AnimatedOpacity(
+              opacity: animationController.value,
+              duration: const Duration(milliseconds: 500),
+              child: FloatingActionButton(
+                onPressed: () {},
+                child: InkWell(
+                    onTap: () {},
+                    child: CenterSvgIcon(
+                      iconName: AppAssets.plus,
+                      color: AppTheme.of(context).primary,
+                    )),
+              ),
             ),
           );
         }),
