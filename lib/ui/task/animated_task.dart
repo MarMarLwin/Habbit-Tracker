@@ -47,15 +47,20 @@ class _TaskAnimatedState extends State<TaskAnimated>
 
   void _checkStatusUpdates(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
+      widget.onCompleted?.call(true);
+      // if (widget.completed) {
       setState(() {
         _showCheckIcon = true;
-        widget.onCompleted?.call(true);
       });
+
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
           _showCheckIcon = false;
         });
       });
+      // } else {
+      //   _animationController.value = 0.0;
+      // }
     }
   }
 
@@ -63,11 +68,9 @@ class _TaskAnimatedState extends State<TaskAnimated>
     if (!widget.completed &&
         _animationController.status != AnimationStatus.completed) {
       _animationController.forward();
-      widget.onCompleted?.call(false);
     } else if (!_showCheckIcon) {
-      _animationController.value = 0.0;
-
       widget.onCompleted?.call(false);
+      _animationController.value = 0.0;
     }
   }
 

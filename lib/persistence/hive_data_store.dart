@@ -9,8 +9,8 @@ import '../models/task.dart';
 import '../models/task_state.dart';
 
 class HiveDataStore {
-  static const frontTasksBoxName = 'frontTasks';
-  static const backTasksBoxName = 'backTasks';
+  static const tasksBoxName = 'Tasks';
+
   static const tasksStateBoxName = 'tasksState';
   static const flagsBoxName = 'flags';
   static String taskStateKey(String key) => 'tasksState/$key';
@@ -27,8 +27,8 @@ class HiveDataStore {
     Hive.registerAdapter<AppThemeSettings>(AppThemeSettingsAdapter());
     // open boxes
     // task lists
-    await Hive.openBox<Task>(frontTasksBoxName);
-    await Hive.openBox<Task>(backTasksBoxName);
+    await Hive.openBox<Task>(tasksBoxName);
+
     // task states
     await Hive.openBox<TaskState>(tasksStateBoxName);
     // theming
@@ -43,29 +43,17 @@ class HiveDataStore {
     required List<Task> backTasks,
     bool force = false,
   }) async {
-    final frontBox = Hive.box<Task>(frontTasksBoxName);
+    final frontBox = Hive.box<Task>(tasksBoxName);
     if (frontBox.isEmpty || force == true) {
       await frontBox.clear();
       await frontBox.addAll(frontTasks);
     } else {
       debugPrint('Box already has ${frontBox.length} items');
     }
-    final backBox = Hive.box<Task>(backTasksBoxName);
-    if (backBox.isEmpty || force == true) {
-      await backBox.clear();
-      await backBox.addAll(backTasks);
-    } else {
-      debugPrint('Box already has ${backBox.length} items');
-    }
   }
 
-  // front and back tasks
-  ValueListenable<Box<Task>> frontTasksListenable() {
-    return Hive.box<Task>(frontTasksBoxName).listenable();
-  }
-
-  ValueListenable<Box<Task>> backTasksListenable() {
-    return Hive.box<Task>(backTasksBoxName).listenable();
+  ValueListenable<Box<Task>> tasksListenable() {
+    return Hive.box<Task>(tasksBoxName).listenable();
   }
 
   // TaskState methods
@@ -106,11 +94,8 @@ class HiveDataStore {
   }
 
   // Save and delete tasks
-  Future<void> saveTask(Task task, FrontOrBackSide frontOrBackSide) async {
-    final boxName = frontOrBackSide == FrontOrBackSide.front
-        ? frontTasksBoxName
-        : backTasksBoxName;
-    final box = Hive.box<Task>(boxName);
+  Future<void> saveTask(Task task) async {
+    final box = Hive.box<Task>(tasksBoxName);
     if (box.values.isEmpty) {
       await box.add(task);
     } else {
@@ -125,11 +110,8 @@ class HiveDataStore {
     }
   }
 
-  Future<void> deleteTask(Task task, FrontOrBackSide frontOrBackSide) async {
-    final boxName = frontOrBackSide == FrontOrBackSide.front
-        ? frontTasksBoxName
-        : backTasksBoxName;
-    final box = Hive.box<Task>(boxName);
+  Future<void> deleteTask(Task task) async {
+    final box = Hive.box<Task>(tasksBoxName);
     if (box.isNotEmpty) {
       final index = box.values
           .toList()

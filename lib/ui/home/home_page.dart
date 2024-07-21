@@ -1,14 +1,23 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/ui/add_task/task_detail_page.dart';
+import 'package:habit_tracker/ui/common_widgets/arc_painter.dart';
+import 'package:hive/hive.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
 import 'package:habit_tracker/persistence/hive_data_store.dart';
 import 'package:habit_tracker/ui/common_widgets/center_svg_icon.dart';
 import 'package:habit_tracker/ui/home/task_grid.dart';
 import 'package:habit_tracker/ui/sliding_panel/sliding_panel_animator.dart';
 import 'package:habit_tracker/ui/theming/app_theme_manager.dart';
-import 'package:hive/hive.dart';
+
 import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
 import '../../models/task.dart';
+import '../add_task/add_task_navigator.dart';
 import '../sliding_panel/sliding_panel.dart';
 import '../sliding_panel/theme_selection_list.dart';
 import '../theming/app_theme.dart';
@@ -20,23 +29,19 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage>
-    with SingleTickerProviderStateMixin {
+class _HomePageState extends ConsumerState<HomePage> {
   final leftAnimatorKey = GlobalKey<SlidingPanelAnimatorState>();
   final rightAnimatorKey = GlobalKey<SlidingPanelAnimatorState>();
   final gridAnimatorKey = GlobalKey<TaskGridState>();
-  late final AnimationController animationController;
+  final fabKey = GlobalKey<FABWidgetState>();
 
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
   }
 
   @override
   void dispose() {
-    animationController.dispose();
     super.dispose();
   }
 
@@ -44,12 +49,35 @@ class _HomePageState extends ConsumerState<HomePage>
     leftAnimatorKey.currentState?.slideIn();
     rightAnimatorKey.currentState?.slideIn();
     gridAnimatorKey.currentState?.enterAnimated();
+    fabKey.currentState?.enterAnimated();
   }
 
   void _exitEditMode() {
     leftAnimatorKey.currentState?.slideOut();
     rightAnimatorKey.currentState?.slideOut();
     gridAnimatorKey.currentState?.exitAnimated();
+    fabKey.currentState?.exitAnimated();
+  }
+
+  Future<void> _addNewTask(WidgetRef ref, AppThemeData appThemeData) async {
+    // * Notify the parent widget that we need to exit the edit mode
+    // * As a result, the parent widget will call exitEditMode() and
+    // * the edit UI will be dismissed
+    // widget.onAddOrEditTask?.call();
+    // * Short delay to wait for the animations to complete
+    await Future.delayed(const Duration(milliseconds: 200));
+    // ignore_for_file:use_build_context_synchronously
+
+    debugPrint('add.....');
+    // * then, show the Add Task page
+    await showCupertinoModalBottomSheet<void>(
+      context: context,
+      barrierColor: AppColors.black50,
+      builder: (_) => AppTheme(
+        data: appThemeData,
+        child: const AddTaskNavigator(),
+      ),
+    );
   }
 
   @override
@@ -82,7 +110,7 @@ class _HomePageState extends ConsumerState<HomePage>
                   ),
                   Expanded(
                     child: ValueListenableBuilder(
-                      valueListenable: datasource.frontTasksListenable(),
+                      valueListenable: datasource.tasksListenable(),
                       builder: (_, Box<Task> box, __) {
                         return TaskGrid(
                           key: gridAnimatorKey,
@@ -144,21 +172,72 @@ class _HomePageState extends ConsumerState<HomePage>
             floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.miniEndFloat,
-            floatingActionButton: AnimatedOpacity(
-              opacity: animationController.value,
-              duration: const Duration(milliseconds: 500),
-              child: FloatingActionButton(
-                onPressed: () {},
-                child: InkWell(
-                    onTap: () {},
-                    child: CenterSvgIcon(
-                      iconName: AppAssets.plus,
-                      color: AppTheme.of(context).primary,
-                    )),
-              ),
+            floatingActionButton: FABWidget(
+              key: fabKey,
+              onPressed: () => _addNewTask(ref, themeSetting.themeData),
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class FABWidget extends StatefulWidget {
+  const FABWidget({
+    super.key,
+    this.onPressed,
+  });
+  final VoidCallback? onPressed;
+
+  @override
+  State<FABWidget> createState() => FABWidgetState();
+}
+
+class FABWidgetState extends State<FABWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
+    _animationController.forward();
+  }
+
+  void enterAnimated() {
+    _animationController.reverse();
+  }
+
+  void exitAnimated() {
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (BuildContext context, Widget? child) {
+        return AnimatedOpacity(
+            opacity: _animationController.value,
+            duration: const Duration(milliseconds: 500),
+            child: child);
+      },
+      child: FloatingActionButton(
+        onPressed: widget.onPressed,
+        child: InkWell(
+            onTap: widget.onPressed,
+            child: CenterSvgIcon(
+              iconName: AppAssets.plus,
+              color: AppTheme.of(context).primary,
+            )),
       ),
     );
   }

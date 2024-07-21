@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:habit_tracker/ui/home/home_page.dart';
+import 'package:habit_tracker/ui/onboarding/onboarding_home.dart';
 
 import 'constants/app_assets.dart';
 import 'models/front_or_back_side.dart';
-import 'models/task.dart';
 import 'persistence/hive_data_store.dart';
 import 'ui/theming/app_theme_manager.dart';
 
@@ -19,16 +18,16 @@ Future<void> main() async {
   MobileAds.instance.initialize();
 
   //create demo tasks
-  dataStore.createDemoTasks(frontTasks: [
-    Task.create(name: 'Cycle to Work', iconName: AppAssets.bike),
-    Task.create(name: 'Wash Your Hands', iconName: AppAssets.washHands),
-    Task.create(name: 'Wear a Mask', iconName: AppAssets.mask),
-    Task.create(name: 'Brush Your Teeth', iconName: AppAssets.toothbrush),
-    Task.create(name: 'Floss Your Teeth', iconName: AppAssets.dentalFloss),
-    Task.create(name: 'Drink Water', iconName: AppAssets.water),
-    Task.create(name: 'Practice Instrument', iconName: AppAssets.guitar),
-    Task.create(name: 'Read for 10 Minutes', iconName: AppAssets.book),
-  ], backTasks: []);
+  // dataStore.createDemoTasks(frontTasks: [
+  //   Task.create(name: 'Cycle to Work', iconName: AppAssets.bike),
+  //   Task.create(name: 'Wash Your Hands', iconName: AppAssets.washHands),
+  //   Task.create(name: 'Wear a Mask', iconName: AppAssets.mask),
+  //   Task.create(name: 'Brush Your Teeth', iconName: AppAssets.toothbrush),
+  //   Task.create(name: 'Floss Your Teeth', iconName: AppAssets.dentalFloss),
+  //   Task.create(name: 'Drink Water', iconName: AppAssets.water),
+  //   Task.create(name: 'Practice Instrument', iconName: AppAssets.guitar),
+  //   Task.create(name: 'Read for 10 Minutes', iconName: AppAssets.book),
+  // ], backTasks: []);
 
   final appThemeSettings = await dataStore.appThemeSettings();
 
@@ -66,7 +65,7 @@ class _MyAppState extends State<MyApp> {
         highlightColor: Colors.transparent,
         hoverColor: Colors.transparent,
       ),
-      home: const HomePage(),
+      home: const OnboardingOrHome(),
     );
   }
 }

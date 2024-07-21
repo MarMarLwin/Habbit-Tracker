@@ -11,7 +11,7 @@ class TaskWithName extends StatelessWidget {
   const TaskWithName({
     super.key,
     required this.task,
-    this.completed = false,
+    required this.completed,
     this.onCompleted,
     this.editTaskBuilder,
   });
