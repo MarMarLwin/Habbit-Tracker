@@ -57,12 +57,13 @@ class HiveDataStore {
   }
 
   // TaskState methods
-  Future<void> setTaskState({
-    required Task task,
-    required bool completed,
-  }) async {
+  Future<void> setTaskState(
+      {required Task task,
+      required bool completed,
+      required DateTime updatedDate}) async {
     final box = Hive.box<TaskState>(tasksStateBoxName);
-    final taskState = TaskState(taskId: task.id, completed: completed);
+    final taskState =
+        TaskState(taskId: task.id, completed: completed, dateTime: updatedDate);
     await box.put(taskStateKey(task.id), taskState);
   }
 
@@ -74,7 +75,8 @@ class HiveDataStore {
 
   TaskState taskState(Box<TaskState> box, {required Task task}) {
     final key = taskStateKey(task.id);
-    return box.get(key) ?? TaskState(taskId: task.id, completed: false);
+    return box.get(key) ??
+        TaskState(taskId: task.id, completed: false, dateTime: DateTime.now());
   }
 
   // App Theme Settings

@@ -19,17 +19,20 @@ class TaskStateAdapter extends TypeAdapter<TaskState> {
     return TaskState(
       taskId: fields[0] as String,
       completed: fields[1] as bool,
+      dateTime: fields[2] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, TaskState obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.taskId)
       ..writeByte(1)
-      ..write(obj.completed);
+      ..write(obj.completed)
+      ..writeByte(2)
+      ..write(obj.dateTime);
   }
 
   @override

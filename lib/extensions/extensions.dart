@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 
@@ -101,6 +102,8 @@ extension DateTimeExt on DateTime {
 
   // yyyy-mm-dd
   String get stringFormat => toIso8601String().substring(0, 10);
+
+  String get ddMMMyyy => DateFormat('dd MMM yyyy').format(this);
 }
 
 // ####### File extension #######

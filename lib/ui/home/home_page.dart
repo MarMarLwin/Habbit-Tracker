@@ -1,19 +1,15 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:habit_tracker/ui/add_task/task_detail_page.dart';
-import 'package:habit_tracker/ui/common_widgets/arc_painter.dart';
+import 'package:habit_tracker/extensions/extensions.dart';
 import 'package:hive/hive.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-
 import 'package:habit_tracker/persistence/hive_data_store.dart';
 import 'package:habit_tracker/ui/common_widgets/center_svg_icon.dart';
 import 'package:habit_tracker/ui/home/task_grid.dart';
 import 'package:habit_tracker/ui/sliding_panel/sliding_panel_animator.dart';
 import 'package:habit_tracker/ui/theming/app_theme_manager.dart';
-
+import 'package:table_calendar/table_calendar.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../models/task.dart';
@@ -26,22 +22,30 @@ class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _HomePageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class HomePageState extends ConsumerState<HomePage>
+    with SingleTickerProviderStateMixin {
   final leftAnimatorKey = GlobalKey<SlidingPanelAnimatorState>();
   final rightAnimatorKey = GlobalKey<SlidingPanelAnimatorState>();
   final gridAnimatorKey = GlobalKey<TaskGridState>();
   final fabKey = GlobalKey<FABWidgetState>();
 
+  late DateTime selectedDate = DateTime.now();
+  late DateTime _focusedDay = DateTime.now();
+  late AnimationController _animationController;
   @override
   void initState() {
     super.initState();
+
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
   }
 
   @override
   void dispose() {
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -60,24 +64,19 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _addNewTask(WidgetRef ref, AppThemeData appThemeData) async {
-    // * Notify the parent widget that we need to exit the edit mode
-    // * As a result, the parent widget will call exitEditMode() and
-    // * the edit UI will be dismissed
     // widget.onAddOrEditTask?.call();
-    // * Short delay to wait for the animations to complete
     await Future.delayed(const Duration(milliseconds: 200));
-    // ignore_for_file:use_build_context_synchronously
-
-    debugPrint('add.....');
-    // * then, show the Add Task page
-    await showCupertinoModalBottomSheet<void>(
-      context: context,
-      barrierColor: AppColors.black50,
-      builder: (_) => AppTheme(
-        data: appThemeData,
-        child: const AddTaskNavigator(),
-      ),
-    );
+    if (mounted) {
+      // * then, show the Add Task page
+      await showCupertinoModalBottomSheet<void>(
+        context: context,
+        barrierColor: AppColors.black50,
+        builder: (_) => AppTheme(
+          data: appThemeData,
+          child: const AddTaskNavigator(),
+        ),
+      );
+    }
   }
 
   @override
@@ -94,27 +93,111 @@ class _HomePageState extends ConsumerState<HomePage> {
             backgroundColor: AppTheme.of(context).primary,
             body: SafeArea(
                 child: Stack(children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: GestureDetector(
+                  onTap: () {
+                    if (_animationController.value == 0) {
+                      _animationController.forward();
+                    } else {
+                      _animationController.reverse();
+                    }
+                  },
+                  child: Padding(
+                    padding: 8.allPadding,
+                    child: Text(
+                      selectedDate.ddMMMyyy,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ).bold(),
+                  ),
+                ),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  GestureDetector(
-                    onTap: _enterEditMode,
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.settings,
-                        size: 32,
-                        color: Colors.white,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: null,
+                        child: Padding(
+                          padding: 8.allPadding,
+                          child: const Icon(
+                            Icons.bar_chart,
+                            size: 32,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: _enterEditMode,
+                        child: Padding(
+                          padding: 8.allPadding,
+                          child: const Icon(
+                            Icons.settings,
+                            size: 32,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  AnimatedBuilder(
+                      builder: (BuildContext context, Widget? child) {
+                        return AnimatedOpacity(
+                          duration: const Duration(milliseconds: 100),
+                          opacity: _animationController.value,
+                          child: AnimatedContainer(
+                              color: Colors.white.withOpacity(0.5),
+                              height: _animationController.value == 0 ? 0 : 400,
+                              curve: Curves.decelerate,
+                              duration: const Duration(milliseconds: 100),
+                              child: child),
+                        );
+                      },
+                      animation: _animationController,
+                      child: TableCalendar(
+                          focusedDay: _focusedDay,
+                          selectedDayPredicate: (day) {
+                            // Use `selectedDayPredicate` to determine which day is currently selected.
+                            // If this returns true, then `day` will be marked as selected.
+
+                            // Using `isSameDay` is recommended to disregard
+                            // the time-part of compared DateTime objects.
+                            return isSameDay(selectedDate, day);
+                          },
+                          onDaySelected: (selectedDay, focusedDay) {
+                            if (!isSameDay(selectedDate, selectedDay)) {
+                              // Call `setState()` when updating the selected day
+                              setState(() {
+                                selectedDate = selectedDay;
+                                _focusedDay = focusedDay;
+                              });
+                              _animationController.reverse();
+                            }
+                          },
+                          onPageChanged: (focusedDay) {
+                            _focusedDay = focusedDay;
+                          },
+                          firstDay:
+                              DateTime.now().subtract(const Duration(days: 60)),
+                          lastDay:
+                              DateTime.now().add(const Duration(days: 60)))),
                   Expanded(
                     child: ValueListenableBuilder(
                       valueListenable: datasource.tasksListenable(),
                       builder: (_, Box<Task> box, __) {
                         return TaskGrid(
                           key: gridAnimatorKey,
-                          tasks: box.values.toList(),
+                          tasks: box.values
+                              .where((x) =>
+                                  x.createDate.ddMMMyyy ==
+                                  selectedDate.ddMMMyyy)
+                              .toList(),
                           appSetting: themeSetting,
                         );
                       },
@@ -167,7 +250,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           .read(appThemeManagerProvider.notifier)
                           .updateVariantIndex(variantIndex),
                     ),
-                  ))
+                  )),
             ])),
             floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
             floatingActionButtonLocation:

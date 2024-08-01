@@ -32,9 +32,9 @@ class _AddEditTaskState extends ConsumerState<AddTaskNavigator> {
                   case AddTaskRoutes.confirmTask:
                     final taskPreset = routeSettings.arguments as TaskPreset;
                     final task = Task.create(
-                      name: taskPreset.name,
-                      iconName: taskPreset.iconName,
-                    );
+                        name: taskPreset.name,
+                        iconName: taskPreset.iconName,
+                        createDate: DateTime.now());
                     return TaskDetailsPage(
                       task: task,
                       isNewTask: true,

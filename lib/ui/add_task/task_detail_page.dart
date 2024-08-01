@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -82,10 +80,10 @@ class _ConfirmTaskContentState extends ConsumerState<ConfirmTaskContent> {
     final textFieldState = _textFieldKey.currentState;
     if (textFieldState != null) {
       final task = Task(
-        iconName: _iconName,
-        id: widget.task.id,
-        name: textFieldState.text,
-      );
+          iconName: _iconName,
+          id: widget.task.id,
+          name: textFieldState.text,
+          createDate: DateTime.now());
 
       try {
         final navigator = Navigator.of(context, rootNavigator: true);

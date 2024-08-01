@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/extensions/extensions.dart';
 import 'package:habit_tracker/ui/common_widgets/edit_task_button.dart';
 import 'package:habit_tracker/ui/task/animated_task.dart';
 
@@ -46,9 +47,7 @@ class TaskWithName extends StatelessWidget {
               ))
           ],
         ),
-        const SizedBox(
-          height: 10,
-        ),
+        5.height,
         Text(
           task.name.toUpperCase(),
           textAlign: TextAlign.center,

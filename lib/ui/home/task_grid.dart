@@ -74,13 +74,13 @@ class TaskGridState extends State<TaskGrid>
       data: widget.appSetting.themeData,
       duration: const Duration(milliseconds: 150),
       child: GridView.builder(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(10),
         itemCount: widget.tasks.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisSpacing: 20,
             crossAxisSpacing: 20,
-            childAspectRatio: 0.8),
+            childAspectRatio: 0.9),
         itemBuilder: (context, index) {
           final task = widget.tasks[index];
           return TaskWithNameLoader(

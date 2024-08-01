@@ -38,10 +38,10 @@ class OnBoarding extends StatelessWidget {
                     padding: 70.allPadding,
                     child: TaskWithName(
                       task: Task(
-                        id: '',
-                        name: 'Tap and hold\nto add a task',
-                        iconName: AppAssets.plus,
-                      ),
+                          id: '',
+                          name: 'Tap and hold\nto add a task',
+                          iconName: AppAssets.plus,
+                          createDate: DateTime.now()),
                       completed: false,
                       onCompleted: (complete) =>
                           _addTask(context, appThemeData),
